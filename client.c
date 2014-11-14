@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     hints.ai_family = AF_INET; /* IPv4 only */
     hints.ai_socktype = SOCK_STREAM; /* TCP */
 
-    s = getaddrinfo(NULL, "2000", &hints, &result);
+    s = getaddrinfo(argv[1], "2000", &hints, &result);
     if (s != 0) {
             exit(1);
     }
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     strcat(welcome, user);
     strcat(welcome, " just joined, say hello!\n");
     int messagesize = strlen(welcome);
-    encode(welcome,argv[1], messagesize);
+    encode(welcome,argv[2], messagesize);
     write(sock_fd, welcome, messagesize);
     int done = 0;
     char* exit = "exit";
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 			strcat(del, ": ");
 			strcat(del,message);
 			size = strlen(del);
-			encode(del,argv[1],size);
+			encode(del,argv[2],size);
 			buffer = del;
 	    	}
 	    	write(sock_fd, buffer, size);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	    int len = read(sock_fd, resp, 99);
     	    resp[len] = '\0';
 	    int i;
-	    encode(resp,argv[1],len);
+	    encode(resp,argv[2],len);
 	    if (resp[0] == 'U')
 	    	printf("%s\n", resp);
 	}
