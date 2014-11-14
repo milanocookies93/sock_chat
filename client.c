@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+void encode(char* target, char* key, int len);
+
 int main(int argc, char** argv)
 {
     int s;
@@ -30,11 +32,14 @@ int main(int argc, char** argv)
     strcpy(welcome, "User ");
     strcat(welcome, user);
     strcat(welcome, " just joined, say hello!\n");
-    write(sock_fd, welcome, strlen(welcome));
+    int messagesize = strlen(welcome);
+    encode(welcome,argv[1], messagesize);
+    write(sock_fd, welcome, messagesize);
     int done = 0;
     char* exit = "exit";
     char* message;
     pid_t childid = fork();
+    int size;
     while (!done)
     {
         if (childid > 0)
@@ -48,6 +53,7 @@ int main(int argc, char** argv)
 			strcat(welcome,user);
 			kill(childid, SIGTERM);
 			buffer = message;
+			size = strlen(buffer);
 	    	}
 
 	    	else
@@ -57,9 +63,11 @@ int main(int argc, char** argv)
 			strcat(del,user);
 			strcat(del, ": ");
 			strcat(del,message);
+			size = strlen(del);
+			encode(del,argv[1],size);
 			buffer = del;
 	    	}
-	    	write(sock_fd, buffer, strlen(buffer));
+	    	write(sock_fd, buffer, size);
 	}
 	
 	else
@@ -67,11 +75,20 @@ int main(int argc, char** argv)
 	    char resp[100];
 	    int len = read(sock_fd, resp, 99);
     	    resp[len] = '\0';
+	    int i;
+	    encode(resp,argv[1],len);
 	    if (resp[0] == 'U')
-            {
-		printf("%s\n", resp);
-            }
+	    	printf("%s\n", resp);
 	}
     }
     return 0;
+}
+
+void encode(char* target, char* key, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+	{
+        	target[i] = target[i] ^ key[i % strlen(key)];
+	}
 }

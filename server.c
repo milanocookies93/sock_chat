@@ -46,6 +46,7 @@ void* line(void* argument)
 	{
 		len = read(users[pos], resp, 99);
 		resp[len] = '\0';
+		printf("%s\n",resp);
 		if (strcmp(resp,exit)==0)
 		{
 			users[pos] = -1;
@@ -53,8 +54,8 @@ void* line(void* argument)
 		}
 		for (i=0; i<(*max); i++)
 		{
-			if (users[i] > 0 && resp[0] == 'U')
-				write(users[i],resp,strlen(resp));
+			if (users[i] > 0)
+				write(users[i],resp,len);
 		}	 			
 	}
 	return NULL;
@@ -67,7 +68,6 @@ int main(int argc, char** argv)
     int max_users = 10;
     int s;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
